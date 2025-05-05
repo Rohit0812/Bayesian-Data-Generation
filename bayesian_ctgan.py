@@ -101,7 +101,6 @@ class BayesianGenerator(nn.Module):
 
     def forward(self, input_):
         x = input_
-        #print(x.shape)
         for residual in self.residuals:
             x = residual(x)
         mu = self.final_mu(x)
@@ -268,7 +267,6 @@ class BayesianCTGAN:
                         c1, m1, col, opt = condvec
                         c1 = torch.from_numpy(c1).to(self._device)
                         m1 = torch.from_numpy(m1).to(self._device)
-                        #print(fakez.shape, c1.shape)
                         fakez = torch.cat([fakez, c1], dim=1)
 
                         perm = np.arange(self._batch_size)
