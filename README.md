@@ -79,3 +79,34 @@ y_fake = discriminator(fake_cat)
 y_real = discriminator(real_cat)
 pen = discriminator.calc_gradient_penalty(real_cat, fake_cat, device, pac=10)
 loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
+
+**Role**: Negative $L_D$ (e.g., -0.6195) indicates the critic assigns higher scores to real data. Small magnitudes reflect a balanced dynamic, aided by PacGAN (`pac=10`).
+
+---
+
+### Generator Loss
+
+The Generator Loss encourages the generator to fool the critic, match discrete column distributions, and regularize weight distributions:
+
+$$
+L_G = -\mathbb{E}_{z \sim P_z, w \sim q(w)}[f(G(z, c; w), c)] + L_{\text{cond}} + \beta \cdot D_{\text{KL}}(q(w) \parallel p(w))
+$$
+
+- **Adversarial Term**: Maximizes critic scores for fake data.
+- **Conditional Loss ($L_{\text{cond}}$)**: Cross-entropy loss ensuring discrete columns match the conditional vector:
+
+$$
+L_{\text{cond}} = \frac{1}{N} \sum_{i=1}^N \sum_{j \in \text{discrete}} m_{i,j} \cdot \text{CE}(G(z_i, c_i; w)_j, c_{i,j})
+$$
+
+- **KL Divergence**: Regularizes weight distributions, with $\beta = 0.001$.
+
+**Code**: Implemented in the training loop:
+
+```python
+y_fake = discriminator(torch.cat([fakeact, c1], dim=1)) if c1 is not None else discriminator(fakeact)
+cross_entropy = cond_loss(fake, c1, m1, transformer=transformer) if condvec is not None else 0
+kl_div = generator.kl_divergence()
+loss_g = -torch.mean(y_fake) + cross_entropy + kl_weight * kl_div
+
+Role: Negative $L_G$ (e.g., -0.2334) indicates the adversarial term dominates, showing generator improvement. Positive $L_G$ (e.g., 0.4706) reflects large $L_{\text{cond}}$.
