@@ -11,7 +11,7 @@ Retaining CTGAN’s residual architecture and conditional generation for robust 
 Regularizing weight distributions with KL divergence to prevent overfitting.
 
 Bayesian Generator
-The generator maps a latent vector ( z \in \mathbb{R}^{d_z} ) and a conditional vector ( c \in \mathbb{R}^{d_c} ) to synthetic data ( \hat{x} \in \mathbb{R}^{d_x} ). Unlike CTGAN’s deterministic generator, the Bayesian Generator treats weights as random variables with variational distributions:[q(w) = \mathcal{N}(w | \mu, \sigma^2)]where (\mu) and (\log \sigma^2) are learnable parameters, and the prior is:[p(w) = \mathcal{N}(0, 1)]Weights are sampled using the reparameterization trick:[w = \mu + \sigma \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, 1)]This is implemented in the BayesianResidual and BayesianGenerator classes:
+The generator maps a latent vector $( z \in \mathbb{R}^{d_z} )$ and a conditional vector ( c \in \mathbb{R}^{d_c} ) to synthetic data ( \hat{x} \in \mathbb{R}^{d_x} ). Unlike CTGAN’s deterministic generator, the Bayesian Generator treats weights as random variables with variational distributions:[q(w) = \mathcal{N}(w | \mu, \sigma^2)]where (\mu) and (\log \sigma^2) are learnable parameters, and the prior is:[p(w) = \mathcal{N}(0, 1)]Weights are sampled using the reparameterization trick:[w = \mu + \sigma \cdot \epsilon, \quad \epsilon \sim \mathcal{N}(0, 1)]This is implemented in the BayesianResidual and BayesianGenerator classes:
 
 Residual Layers: Each BayesianResidual layer has two linear layers (fc_mu, fc_logvar) to parameterize (\mu) and (\log \sigma^2), followed by batch normalization, ReLU, and input concatenation.
 Final Layer: The final_mu and final_logvar layers parameterize the output transformation.
